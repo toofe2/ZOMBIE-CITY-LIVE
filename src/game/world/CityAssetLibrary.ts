@@ -3,8 +3,16 @@ import { SceneLoader, TransformNode, type Scene } from '@babylonjs/core';
 
 export const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/toofe2/ZOMBIE-CITY-LIVE-ASSETS@main/assets/';
 
+export type AssetDiagnostic = {
+  key: string;
+  path: string;
+  status: 'loaded' | 'failed';
+  error?: string;
+};
+
 export class CityAssetLibrary {
   private templates = new Map<string, TransformNode>();
+  diagnostics: AssetDiagnostic[] = [];
   loaded = 0;
   failed = 0;
 
@@ -15,13 +23,18 @@ export class CityAssetLibrary {
     try {
       const result = await SceneLoader.ImportMeshAsync('', ASSET_BASE, path, this.scene);
       const root = new TransformNode(`tpl-${key}`, this.scene);
-      for (const mesh of result.meshes) if (mesh.parent == null) mesh.parent = root;
+      for (const mesh of result.meshes) {
+        if (mesh.parent == null) mesh.parent = root;
+      }
       root.setEnabled(false);
       this.templates.set(key, root);
       this.loaded++;
+      this.diagnostics.push({ key, path, status:'loaded' });
       return root;
     } catch (err) {
       this.failed++;
+      const message = err instanceof Error ? err.message : String(err);
+      this.diagnostics.push({ key, path, status:'failed', error:message });
       console.warn('[CityAssetLibrary] asset failed:', path, err);
       return null;
     }
