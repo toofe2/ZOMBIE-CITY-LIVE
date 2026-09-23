@@ -1,13 +1,13 @@
 {
   "name": "zombie-city-live",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.1",
   "type": "module",
   "scripts": {
-    "dev": "vite 0.0.0.0",
+    "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
     "@babylonjs/core": "^9.27.1",
